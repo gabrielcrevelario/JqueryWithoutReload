@@ -8,8 +8,11 @@
 </head>
         <body>
                 <form action="POST">
+                    <label >titulo</label>
                     <input type="text" name="titulo" id=""><br>
+                    <label >usuarioId</label>
                     <input type="text" name="usuarioId" id=""><br>
+                    <label>completo</label>
                     <input type="checkbox" name="completo" id=""> 
                     <button id="salvar" class="btn btn-primary">Salvar</button>   
                 </form>
@@ -33,15 +36,30 @@
             </div>
             <script>
     var $tbody = $( 'tbody' );
+    var array = []
 
 
-$('#salvar')
+$('#salvar').click(function(e) {
+    e.preventDefault()
+    debugger
+    item = {};
+    var target = e.target;
+    item.titulo = target.form[0].value
+    item.usuarioId= parseInt(target.form[1].value)
+    item.completo = (target.form[2].value === 'on') ? true : false;
+    item.dateLog = new Date()
+    item = Object.assign(item)
+    $.post('http://localhost:3000/tarefa', item)
+    array.push(item)
+     listar(array.reverse())
+})
 
 $('#pesquisar').click( function pesquisar(e) {
 e.preventDefault();
 var termo = $('input:text').val()
 $.getJSON('http://localhost:3000/tarefa?titulo_like='+termo , function(data) { 
     var item =""
+    
     console.log(data)
     $.each(data,function (key, val)  {
         debugger
@@ -53,15 +71,22 @@ $.getJSON('http://localhost:3000/tarefa?titulo_like='+termo , function(data) {
             item+= "</tr>"
  
  })
+ array = data;
  console.log(item)
  $tbody.html(item);
 })
 
 })  
 
-        $.getJSON('http://localhost:3000/tarefa', function(data) {
-                    var items = "";    
+        $.getJSON('http://localhost:3000/tarefa', function(data) { 
+            
+            listar(data)
+            array = data;
+            } )
 
+        function listar(data) {
+                    var items = "";    
+debugger
         $.each(data,function(key, val) {
             console.log(data)
             items+= "<tr  scope=\"row\" >"
@@ -72,9 +97,8 @@ $.getJSON('http://localhost:3000/tarefa?titulo_like='+termo , function(data) {
             items+= "</tr>"
             $tbody.append($.parseHTML(items))
         })
-        })   
-
-       console.log(items)
+        return $tbody;
+        }
     </script>
 
 
